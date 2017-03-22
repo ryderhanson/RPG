@@ -22,6 +22,10 @@ public class TextBoxManager : EventHandler {
     [SerializeField]
     private AudioSource _audioSource = null;
 
+    private bool _isCurrentlyPopulating = false;
+
+    private string _contentToSet = "";
+
     public override void SubscribeEvents()
     {
         Events.AddListener<PopTextBoxEvent>(OnPopTextBox);
@@ -45,7 +49,11 @@ public class TextBoxManager : EventHandler {
         _textBox.SetActive(true);
         _mainMessageText.text = "";
 
-        for(int i = 1; i < content.Length + 1; ++i)
+        _contentToSet = content;
+
+        _isCurrentlyPopulating = true;
+
+        for (int i = 1; i < content.Length; ++i)
         {
             _mainMessageText.text = content.Substring(0, i);
 
@@ -56,6 +64,8 @@ public class TextBoxManager : EventHandler {
 
             yield return new WaitForSeconds(_letterAddDelay);
         }
+
+        _isCurrentlyPopulating = false;
     }
 
     // Use this for initialization
@@ -64,7 +74,22 @@ public class TextBoxManager : EventHandler {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (_isCurrentlyPopulating)
+            {
+                StopAllCoroutines();
+
+                _isCurrentlyPopulating = false;
+
+                _mainMessageText.text = _contentToSet;
+            }
+            else if (_textBox.activeSelf)
+            {
+                _textBox.SetActive(false);
+            }
+        }
 	}
 }
