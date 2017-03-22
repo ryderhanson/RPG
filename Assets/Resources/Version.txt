@@ -1,0 +1,8 @@
+{
+  "product" : "Jammer",
+  "version" : "0.2.0",
+  "label"   : null,
+  "code"    : "1",
+  "build"   : "f46fdb2",
+  "unity"   : "5.3.6f1"
+}
