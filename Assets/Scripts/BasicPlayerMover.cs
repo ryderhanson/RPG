@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using Jammer;
 
-public class BasicPlayerMover : MonoBehaviour {
-    [SerializeField]
-    private float _speed = 30f;
+public class BasicPlayerMover : MonoBehaviour
+{
+    [SerializeField] private float _speed = 30f;
 
-    [SerializeField]
-    private Animator _animator = null;
+    [SerializeField] private Animator _animator = null;
 
     private Rigidbody2D _rigid = null;
+
+    private bool _attemptedInteractionThisFrame = false;
 
     private enum DIRECTION
     {
@@ -18,13 +19,18 @@ public class BasicPlayerMover : MonoBehaviour {
         UP = 3,
         DOWN = 4
     }
-	// Use this for initialization
-	void Start () {
+
+    // Use this for initialization
+    void Start()
+    {
         _rigid = GetComponent<Rigidbody2D>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        _attemptedInteractionThisFrame = false;
+
         float locSpeed = _speed * Time.deltaTime;
         Vector3 newVelocity = Vector3.zero;
 
@@ -62,8 +68,25 @@ public class BasicPlayerMover : MonoBehaviour {
             newVelocity += new Vector3(locSpeed, 0, 0);
         }
 
-        _animator.SetInteger("Direction", (int)curDirection);
+        if (Input.GetMouseButtonDown(0))
+        {
+            _attemptedInteractionThisFrame = true;
+        }
+
+        _animator.SetInteger("Direction", (int) curDirection);
 
         _rigid.velocity = newVelocity;
+    }
+
+    void OnTriggerStay2D(Collider2D coll)
+    {
+        if (_attemptedInteractionThisFrame)
+        {
+            IInteractable interactable = coll.gameObject.GetComponent<IInteractable>();
+            if (interactable != null)
+            {
+                interactable.OnInteractedWith(this);
+            }            
+        }
     }
 }

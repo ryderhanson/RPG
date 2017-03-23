@@ -40,7 +40,13 @@ public class TextBoxManager : EventHandler {
     {
         if (!e.Handled)
         {
-            StartCoroutine(PopulateContent(e.Content));
+            e.Handled = true;
+            if (!_isCurrentlyPopulating)
+            {
+                StopAllCoroutines();
+
+                StartCoroutine(PopulateContent(e.Content));                
+            }
         }
     }
 
@@ -53,9 +59,9 @@ public class TextBoxManager : EventHandler {
 
         _isCurrentlyPopulating = true;
 
-        for (int i = 1; i < content.Length; ++i)
+        for (int i = 0; i < content.Length; ++i)
         {
-            _mainMessageText.text = content.Substring(0, i);
+            _mainMessageText.text = content.Substring(0, i + 1);
 
             if (content[i] != ' ')
             {
@@ -76,7 +82,7 @@ public class TextBoxManager : EventHandler {
 	// Update is called once per frame
 	void Update ()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             if (_isCurrentlyPopulating)
             {
@@ -87,6 +93,14 @@ public class TextBoxManager : EventHandler {
                 _mainMessageText.text = _contentToSet;
             }
             else if (_textBox.activeSelf)
+            {
+                _textBox.SetActive(false);
+            }
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (_textBox.activeSelf && !_isCurrentlyPopulating)
             {
                 _textBox.SetActive(false);
             }
